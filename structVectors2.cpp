@@ -90,5 +90,6 @@ int main(){
 
     std::cout << "Sorted users!\n";
     sortUser(athlete);
+    std::cout << "\nDone challenge!" << std::endl;
     return 0;
 }
