@@ -11,7 +11,7 @@ struct Athlete{
 
 void display(std::vector<Athlete> &det){
     for(int i = 0;i<det.size();i++){
-        std:: cout << det[i].firstName << '\t' << det[i].lastName << '\t' << det[i].bench << '\t' << det[i].deadlift << '\t' << det[i].bench + det[i].deadlift << std::endl;
+        std::cout << i << ". " <<det[i].firstName << '\t' << det[i].lastName << '\t' << det[i].bench << '\t' << det[i].deadlift << '\t' << det[i].bench + det[i].deadlift << std::endl;
     }
 }
 
@@ -44,7 +44,7 @@ void sortUser(std::vector<Athlete> &det){
         great = det[i].bench + det[i].deadlift;
         for(int j = 0;j<det.size();j++){
             greatest = det[j].bench + det[j].deadlift;
-            if(greatest > great){
+            if(greatest < great){
                 std::string tmp = det[i].firstName;
                 det[i].firstName = det[j].firstName;
                 det[j].firstName = tmp;
@@ -61,6 +61,15 @@ void sortUser(std::vector<Athlete> &det){
         }
     }
     display(det);
+}
+
+void deleteSur(std::vector<Athlete> &det, std::string surname){
+    for(int i = 0;i<det.size();i++){
+        if(det[i].lastName == surname){
+            std::cout << "\nI will erase this human - " << det[i].firstName << " " << det[i].lastName << std::endl;
+            det.erase(det.begin() + i);
+        }
+    }
 }
 
 int main(){
@@ -90,6 +99,11 @@ int main(){
 
     std::cout << "Sorted users!\n";
     sortUser(athlete);
+
+    deleteSur(athlete, "Schwanzi");
+    std::cout << "Display deleted structure!\n"; 
+    display(athlete);
+
     std::cout << "\nDone challenge!" << std::endl;
     return 0;
 }
