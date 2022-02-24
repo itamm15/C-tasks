@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <vector>
 #include <fstream>
+#include <random>
 
 bool flag = true;
 std::string login, surname, password;
@@ -31,9 +32,34 @@ void pushToVector(CarLender carLen, std::vector<CarLender> &det){
     det.push_back(carLen);
 }
 
+CarLender pushToVectorFile(std::fstream &file, std::vector<CarLender> &det){
+    CarLender lender;
+    std::string line;
+    if(file.is_open()){
+        while(std::getline(file, line)){
+            size_t pos = line.find(';');
+            std::string name = line.substr(0, pos);
+            line = line.substr(pos+1, line.length());
+            pos = line.find(';');
+            std::string surname = line.substr(0, pos);
+            lender.Name = name;
+            lender.Surname = surname;
+            det.push_back(lender);
+        }
+    }
+    return lender;
+}
+
 void printTable(std::vector<CarLender> &det){
     for(std::vector<CarLender>::iterator itr = det.begin();itr != det.end();++itr){
         std::cout << itr->Name << "\t" << itr->Surname << "\t" << itr->LenderID <<  std::endl;
+    }
+}
+
+void randomID(){
+    std::string randomString = "";
+    for(int i = 0;i<5;i++){
+        //int randomNum
     }
 }
 
@@ -66,8 +92,8 @@ void loginInto(std::fstream &file){
     if(file.is_open()){
         while(std::getline(file, line)){
             //std::cout << line << std::endl;
-            int founded = line.find(';');
-            std::string loginCompare = line.substr(0,founded), passwordCompare = line.substr(founded + 1, line.length()-1);
+            int foundedLast = line.find_last_of(';'), founded = line.find(';');
+            std::string loginCompare = line.substr(0, founded), passwordCompare = line.substr(foundedLast + 1, line.length()-1);
             //std::cout << "Founded:\t" << founded << "login to compare:" << loginCompare <<std::endl;
             //std::cout << "Password to compare:" << passwordCompare << std::endl;
             if(login == loginCompare){
@@ -89,6 +115,12 @@ int main(){
 
     std::fstream fileData;
     fileData.open("data.txt", std::ios::in | std::ios::out | std::ios::app);
+    std::fstream fileData2;
+    fileData2.open("data.txt", std::ios::in );
+
+    std::vector<CarLender> carLenders;  
+
+    pushToVectorFile(fileData2, carLenders);
 
     //MAIN MENU
     char choice {};
@@ -102,7 +134,7 @@ int main(){
     switch(choice){
         case '1':{
             //Log in
-            loginInto(fileData);
+            loginInto(fileData2);
             flag = false;
             clearWindow();
             break;
@@ -110,6 +142,7 @@ int main(){
         case '2':{
             //Create an account
             CarLender lender = createAccount(fileData);
+            std::cout << lender.Name << " " << lender.Surname << " " << lender.password << std::endl;
             flag = false;
             break;
         }
@@ -119,7 +152,6 @@ int main(){
       }
     }
 
-    std::vector<CarLender> carLenders;
     CarLender Matthew;
     Matthew.Name = "Matthew";
     Matthew.Surname = "Osinski";
@@ -145,6 +177,7 @@ int main(){
         std::cin >> choice;
         switch(choice){
             case '1':{
+                //this option will be in future avaiable ONLY for admin
                 bool flag = true;
                 char choice {};
                 while(flag){
@@ -183,6 +216,7 @@ int main(){
         clearWindow();
     }
 
+    fileData2.close();
     fileData.close();
 
     return 0;
