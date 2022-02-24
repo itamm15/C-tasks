@@ -2,8 +2,10 @@
 #include <string>
 #include <cstdlib>
 #include <vector>
+#include <fstream>
 
 bool flag = true;
+std::string login, surname, password;
 
 struct CarRent{
     std::string CarType {};
@@ -17,6 +19,7 @@ struct CarRent{
 struct CarLender{
     std::string Name {};
     std::string Surname {};
+    std::string password {};
     std::string LenderID {};
 };
 
@@ -34,16 +37,58 @@ void printTable(std::vector<CarLender> &det){
     }
 }
 
-void createAccount(){
-    std::string login;
-    std::cout << "Provide login\t";
-    std::getline(std::cin, login);
-    std::string password;
+CarLender createAccount(std::fstream &file){
+    CarLender lender;
+    std::cout << "Provide name\t";
+    std::cin >> login;
+    lender.Name = login;
+    std::cout << "Provid surname\t";
+    std::cin >> surname;
+    lender.Surname = surname;
     std::cout << "Provide password\t";
-    std::getline(std::cin, password);
+    std::cin >> password;
+    lender.password = password;
+    if(file.is_open()){
+        //std::cout << "i am here";
+        file << lender.Name << ";" << lender.Surname << ";" << lender.password << "\n";
+    }else{
+        std::cout << "The database is not working!";
+    }
+    return lender;
+}
+
+void loginInto(std::fstream &file){
+    std::string line;
+    std::cout << "Provide login\t";
+    std::cin >> login;
+    std::cout << "Provide password\t";
+    std::cin >> password;
+    if(file.is_open()){
+        while(std::getline(file, line)){
+            //std::cout << line << std::endl;
+            int founded = line.find(';');
+            std::string loginCompare = line.substr(0,founded), passwordCompare = line.substr(founded + 1, line.length()-1);
+            //std::cout << "Founded:\t" << founded << "login to compare:" << loginCompare <<std::endl;
+            //std::cout << "Password to compare:" << passwordCompare << std::endl;
+            if(login == loginCompare){
+                //std::cout << "I AM HERE!" << loginCompare << " " << passwordCompare << std::endl;
+                if(password == passwordCompare){
+                    std::cout << "Authorization completed.\n";
+                    std::getchar();
+                }else{
+                    std::cout << "Authorization not completed. Please, try again later.";
+                    std::getchar();
+                    exit(0);
+                }
+            }
+        }
+    }
 }
 
 int main(){
+
+    std::fstream fileData;
+    fileData.open("data.txt", std::ios::in | std::ios::out | std::ios::app);
 
     //MAIN MENU
     char choice {};
@@ -57,20 +102,15 @@ int main(){
     switch(choice){
         case '1':{
             //Log in
-            std::string login, password;
-            std::cout << "Provide your login \t";
-            std::cin.ignore();
-            std::getline(std::cin, login);
-            std::cout << "Provide your password \t";
-            std::getline(std::cin, password);
-            //std::cout << login << " " << password << std::endl;
+            loginInto(fileData);
             flag = false;
             clearWindow();
             break;
         }
         case '2':{
             //Create an account
-            createAccount();
+            CarLender lender = createAccount(fileData);
+            flag = false;
             break;
         }
         default:{
@@ -100,7 +140,8 @@ int main(){
     */
     flag = true;
     while(flag){
-        std::cout << "Welcome in Car Rental Program! To chose given option, enter the number and press enter.\n1. Table with description,\n2. Your account,\n3. Extend rental,\n4. Finish rental,\n5. Check rental history,\n6. Exit.\n";
+        //std::cout << login << " " << password << "I AM HERE!\n";
+        std::cout << "Welcome in Car Rental Program, " << login << "! To chose given option, enter the number and press enter.\n1. Table with description,\n2. Your account,\n3. Extend rental,\n4. Finish rental,\n5. Check rental history,\n6. Exit.\n";
         std::cin >> choice;
         switch(choice){
             case '1':{
@@ -141,6 +182,8 @@ int main(){
         }
         clearWindow();
     }
+
+    fileData.close();
 
     return 0;
 }
